@@ -37,14 +37,12 @@ struct BigInt {
 *** @param *big_int The converted string now as BigInt.
 * @return The number of characters converted.
 */
-//done
-int strtobig_int(const char *str, int len, struct BigInt* big_int);
+ int strtobig_int(const char *str, int len, struct BigInt* big_int);  //done
 
 /** print_big_int() prints a BigInt.
 *** @param *big_int The BigInt to be printed.
 */
-//done
-void print_big_int(const struct BigInt *big_int);
+void print_big_int(const struct BigInt *big_int);   //done
 
 /** multiply() multiplies a BigInt by an int.
 *** @param big_int The BigInt to be multiplied.
@@ -116,18 +114,41 @@ void print_big_int(const struct BigInt *big_int)
 {
 	printf("%d\n",big_int->digits_count );
 	printf("%d",big_int->the_int[0]);
-	printf("%d",big_int->the_int[2]);
+	printf("%d\n",big_int->the_int[2]);
 	printf("hi\n" );
-	for (int i = big_int->digits_count ; i >0 ; i--)
+	for (int i = big_int->digits_count-1 ; i >=0 ; i--)
 	{
 			printf("%d",big_int->the_int[i]);
 	}
 }
 void multiply(const struct BigInt *big_int, int factor, struct BigInt *big_result)
 {
-	for (int i = 0; i < 9; i++)
+	printf("TEST\n" );
+	while (factor <= 9)
 	{
-		int result;
-		result = big_int-> the_int[i];
+		for (int i = big_int->digits_count-1 ; i >=0 ; i--)
+		{
+				printf("%d ",big_int->the_int[i]);
+		}
+		printf("* %d = ",factor );
+		for (int i = big_int->digits_count-1 ; i >=0 ; i--)
+		{
+			int result;
+			if (big_int-> the_int[i] * factor >= 10)
+			{
+				big_result->the_int[i] = big_int-> the_int[i];
+				big_result->the_int[i+1] = ((big_int-> the_int[i] * factor) - (big_int-> the_int[i] * factor) % 10)/10;
+			}
+			else
+			{
+				big_result->the_int[i] = big_int-> the_int[i] * factor;
+			}
+		}
+		for (int i = big_int->digits_count-1 ; i >=0 ; i--)
+		{
+				printf("%d",big_result->the_int[i]);
+		}
+		printf("\n" );
+		factor++;
 	}
 }
