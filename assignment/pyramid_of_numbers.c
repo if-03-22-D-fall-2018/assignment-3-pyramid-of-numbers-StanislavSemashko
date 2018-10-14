@@ -12,8 +12,10 @@
  * again starting by 2, 3, etc.
  * ----------------------------------------------------------
  */
-#include <stdio.h>
-#include <string.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <stdbool.h>
+ #include <math.h>
 
 /// The maximum number of digits allowed in a big int.
 #define MAX_DIGITS 80
@@ -28,7 +30,7 @@ struct BigInt {
 	/** array of digits of big int. */
 	unsigned int the_int[MAX_DIGITS];
 };
-
+		void	set_digits_count(const struct BigInt *big_int,  struct BigInt *big_result);
 /** strtobig_int converts a string into a BigInt. If strtobig_int runs
 *** against a character not between '0' and '9' the conversion stops
 *** at this point.
@@ -82,6 +84,8 @@ int main(int argc, char *argv[])
 	char user_input[MAX_DIGITS];
 	int len;
 	int factor = 2;
+	int divisor = 9;
+
 
 	// number.digits_count = 5;
 	// number.the_int[0] = 1
@@ -91,8 +95,30 @@ int main(int argc, char *argv[])
 	scanf("%s",user_input);
 	len = strlen(user_input);
 	strtobig_int(user_input, len, &number);
-	print_big_int(&number);
-	multiply(&number,factor, &big_result);
+	//print_big_int(&number);
+
+	//multiply(&number,factor, &big_result);
+
+	for (int i = 2; i < 10; i++)
+	{
+		print_big_int(&number);
+		multiply(&number, factor, &big_result);
+		printf("\n");
+		set_digits_count(&number, &big_result);
+		number = big_result;
+		factor++;
+	}
+	for (int i = 2; i < 10; i++)
+	{
+			print_big_int(&number);
+
+			divide(&number, divisor, &big_result);
+
+			printf("\n");
+			number = big_result;
+			divisor--;
+	}
+
 	return 0;
 }
 
@@ -112,43 +138,87 @@ int strtobig_int(const char *str, int len, struct BigInt* big_int)
 }
 void print_big_int(const struct BigInt *big_int)
 {
-	printf("%d\n",big_int->digits_count );
-	printf("%d",big_int->the_int[0]);
-	printf("%d\n",big_int->the_int[2]);
-	printf("hi\n" );
 	for (int i = big_int->digits_count-1 ; i >=0 ; i--)
 	{
-			printf("%d",big_int->the_int[i]);
+		printf("%d",big_int->the_int[i]);
 	}
 }
 void multiply(const struct BigInt *big_int, int factor, struct BigInt *big_result)
 {
-	printf("TEST\n" );
-	while (factor <= 9)
-	{
-		for (int i = big_int->digits_count-1 ; i >=0 ; i--)
-		{
-				printf("%d ",big_int->the_int[i]);
-		}
+	//while (factor <= 9)
+	//{
+		//for (int i = big_int->digits_count-1 ; i >=0 ; i--)
+		//{
+			//	printf("%d",big_int->the_int[i]);
+		//}
 		printf("* %d = ",factor );
+		//printf("digits count :%d\n",big_int->digits_count );
 		for (int i = big_int->digits_count-1 ; i >=0 ; i--)
 		{
-			int result;
 			if (big_int-> the_int[i] * factor >= 10)
 			{
-				big_result->the_int[i] = big_int-> the_int[i];
-				big_result->the_int[i+1] = ((big_int-> the_int[i] * factor) - (big_int-> the_int[i] * factor) % 10)/10;
+				if (big_result->the_int[i] >= 1 && big_result->the_int[i] <= 9)
+				{
+					 	big_result->the_int[i] += (big_int-> the_int[i] * factor) % 10;
+						big_result->the_int[i-1] = ((big_int-> the_int[i] * factor) - ((big_int-> the_int[i] * factor)%10)) / 10;
+				}
+				else
+				{
+					big_result->the_int[i] = (big_int-> the_int[i] * factor) % 10;
+					big_result->the_int[i-1] = ((big_int-> the_int[i] * factor) - ((big_int-> the_int[i] * factor)%10)) / 10;
+				}
 			}
 			else
 			{
-				big_result->the_int[i] = big_int-> the_int[i] * factor;
+				if (big_result->the_int[i] >= 1 && big_result->the_int[i] <= 9)
+				{
+					 		big_result->the_int[i] += big_int-> the_int[i] * factor;
+				}
+				else
+				{
+						big_result->the_int[i] = big_int-> the_int[i] * factor;
+				}
 			}
 		}
 		for (int i = big_int->digits_count-1 ; i >=0 ; i--)
 		{
 				printf("%d",big_result->the_int[i]);
 		}
-		printf("\n" );
-		factor++;
-	}
+		//printf("\n" );
+		//factor++;
+	//}
+}
+void divide(const struct BigInt *big_int, int divisor, struct BigInt *big_result)
+{
+		int ram =0;
+		printf("/ %d = ",divisor );
+		for (int i = 0; i < big_int->digits_count ; i++)
+		{
+			if (big_int-> the_int[i] + ram *10 / divisor < 1)
+			{
+				big_result->the_int[i] = 0;
+				ram = big_result->the_int[i];
+			}
+			else
+			{
+				if (ram != 0)
+				{
+							big_result->the_int[i] = (big_int-> the_int[i] + ram*10) / divisor;
+							ram = (big_int-> the_int[i] + ram*10) - divisor * big_result->the_int[i];
+				}
+				else
+				{
+							big_result->the_int[i] = big_int-> the_int[i] / divisor;
+				}
+			}
+		}
+		for (int i = 0;  i < big_int->digits_count ; i++)
+		{
+				printf("%d",big_result->the_int[i]);
+		}
+}
+
+void set_digits_count(const struct BigInt *big_int, struct BigInt *big_result)
+{
+	big_result->digits_count = big_int->digits_count;
 }
